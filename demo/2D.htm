@@ -91,24 +91,22 @@
 
 
 		var running3d;
-		var a=0,azb=[0,0,0];
+		var a=0;
 		var ss=1;
 		$(".box li").click(function(){
 			$(this).data('id');
 
 			rotate(1,0,0,360);
 		});
-		var nowzb={x:0,y:1,z:2};
+		var nowzb={x:0,y:1,z:2},azb=[0,0,0];
 		function rotateOne(xyz,angle){
 			if(running3d)
 				return;
 			running3d=true;
 			var box=$('.box')[0];
-			var fs=1;
-			if(angle<0){
-				fs=-1;
-				angle=-angle;
-			}
+			var fs=(angle<0)?-1:1;
+			
+			angle=fs*angle;
 			var i = Math.ceil(angle/5);
 			var t=fs*angle/i;
 			
@@ -184,11 +182,6 @@
 		document.onkeydown = function(e) { //改变蛇方向 
 			var code = e.keyCode - 37; 
 			switch(code){
-				/*
-				case 1 : rotate(1,0,0,90);break;//上 
-				case 2 : rotate(0,1,0,90);break;//右 
-				case 3 : rotate(1,0,0,-90);break;//下 
-				case 0 : rotate(0,1,0,-90);break;//左 */
 
 				case 0 : rotateOne("Y",-90);break;//左 
 				case 1 : rotateOne("X",90);break;//上 
