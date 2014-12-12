@@ -27,6 +27,7 @@
 		line-height:160px;
 		text-align:center;
 		font-size:48px;
+		border: 1px solid #666;
 	}
 	ul li canvas{
 		width: 160px;
@@ -36,7 +37,6 @@
 	li:nth-of-type(1){
 		top:160px;
 		left:160px;
-		background:red;
 		-moz-transform-origin:top;
 		-moz-transform:rotateX(90deg);
 		-webkit-transform-origin:top;
@@ -45,12 +45,10 @@
 	li:nth-of-type(2){
 		top:160px;
 		left:160px;
-		background:orange;
 	}
 	li:nth-of-type(3){
 		top:320px;
 		left:160px;
-		background:rgb(255,192,203);
 		-moz-transform-origin:top;
 		-moz-transform:rotateX(90deg);
 		-webkit-transform-origin:top;
@@ -59,7 +57,6 @@
 	li:nth-of-type(4){
 		top:160px;
 		left:160px;
-		background:green;
 		-moz-transform-origin:left;
 		-moz-transform:rotateY(-90deg);
 		-webkit-transform-origin:left;
@@ -67,17 +64,15 @@
 	}
 	li:nth-of-type(5){
 		top:160px;
-		left:320px;
-		background:#abcdef;
-		-moz-transform-origin:left;
-		-moz-transform:rotateY(-90deg);
-		-webkit-transform-origin:left;
-		-webkit-transform:rotateY(-90deg);
+		left:160px;
+		-moz-transform-origin:right;
+		-moz-transform:rotateY(90deg);
+		-webkit-transform-origin:right;
+		-webkit-transform:rotateY(90deg);
 	}
 	li:nth-of-type(6){
 		top:160px;
 		left:160px;
-		background:#2f23f2;
 		-moz-transform:translateZ(160px);
 		-webkit-transform:translateZ(160px);
 	}

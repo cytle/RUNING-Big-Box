@@ -31,7 +31,7 @@ function rotateOne(xyz,angle){
 		}
 
 	}else{
-		log("Y<br>");
+		log("X<br>");
 		if(nowzb.y<0){
 			t=-t;
 			d=-nowzb.y;
@@ -77,6 +77,7 @@ function rotateOne(xyz,angle){
 			log("<br>"+box.style.transform);
 			var aa;
 			
+			running3d=false;
 			return;
 		}
 		i--;

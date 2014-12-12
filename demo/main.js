@@ -18,18 +18,18 @@ $(function(){
 			var map = []; //记录蛇运行路径 
 			var size = 8; //蛇身单元大小 
 			var direction = 2; // 1 向上 2 向右 0 左 3下 
-			
+	
 			var intervalD = window.setInterval(set_game_speed, time); // 移动蛇 
 			function set_game_speed(){ // 移动蛇 
 
 				changeFace();
 				switch(direction){ 
-					case 1:y = (y-((nowzb.y>0)?1:-1)*size);break; 
-					case 2:x = (x+((nowzb.x>0)?1:-1)*size);break; 
-					case 3:y = (y+((nowzb.y>0)?1:-1)*size);break; 
-					case 0:x = (x-((nowzb.x>0)?1:-1)*size);break; 
+					case 1:y = (y-size);break; 
+					case 2:x = (x+size);break; 
+					case 3:y = (y+size);break; 
+					case 0:x = (x-size);break; 
 				} 
-				$(".log").html($(".log").html()+"<br>x:"+x+" y:"+y+" face:"+face.now);
+				//$(".log").html($(".log").html()+"<br>x:"+x+" y:"+y+" face:"+face.now);
 				
 				for(var i=0;i<map.length;i++){ 
 					if(map[i].face==face.now&& parseInt(map[i].x)==x && parseInt(map[i].y)==y){ 
@@ -54,7 +54,7 @@ $(function(){
 				var ff;
 				
 
-				if((x>=width&&nowzb.x>0)||(x<=0&&nowzb.x<0)){
+				if(x>=width){
 
 					ff=face.now;
 					face.now=face.right;
@@ -62,10 +62,9 @@ $(function(){
 					face.dm=face.left;
 					face.left=ff;
 
-					rotateOne("Y",-90);
 
-					x=(nowzb.x>0)?0:width;
-				}else if((x>=width&&nowzb.x<0)||(x<=0&&nowzb.x>0)){
+					x=0;
+				}else if(x<=0){
 
 					ff=face.now;
 					face.now=face.left;
@@ -73,19 +72,17 @@ $(function(){
 					face.dm=face.right;
 					face.right=ff;
 
-					rotateOne("Y",90);
-					x=(nowzb.x>0)?width:0;
-				}else if((y>=width&&nowzb.y>0)||(y<=0&&nowzb.y<0)){
+					x=width;
+				}else if((y>=width)){
 
 					ff=face.now;
 					face.now=face.bottom;
 					face.bottom=face.dm;
 					face.dm=face.top;
 					face.top=ff;
-					rotateOne("X",90);
 
-					y=(nowzb.y>0)?0:width;
-				}else if((y>=width&&nowzb.y<0)||(y<=0&&nowzb.y>0)){
+					y=0;
+				}else if((y<=0)){
 
 
 					ff=face.now;
@@ -94,15 +91,15 @@ $(function(){
 					face.dm=face.bottom;
 					face.bottom=ff;
 
-					rotateOne("X",-90);
-
-					y=(nowzb.y>0)?width:0;
+					y=width;
 				}
 			}
 
 			var running=true;
 
 			document.onkeydown = function(e) { //改变蛇方向 
+				
+				$(".log").html($(".log").html()+"<br>x:"+direction);
 				if(e.keyCode==32){
 					if(running){
 						clearInterval(intervalD);
