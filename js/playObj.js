@@ -32,8 +32,8 @@ function initCanvas(CanvasId){
 	this.xspeed=xspeed?xspeed:0;
 	this.yspeed=yspeed?yspeed:0;
 
-	this.rect=function(){
-		drawMap.push([this.x,this.y,this.w,this.h]);
+	this.rect=function(type){
+		drawMap.push([this.x,this.y,this.w,this.h,type?type:0]);
 	}
 }
 
@@ -60,13 +60,13 @@ function initCanvas(CanvasId){
  	this.xspeedUp;
  	this.is_ysup=false;
  	this.is_xsup=false;
- 	this.hp=100;
+ 	this.hp=0;
  	this.setKeyDown=function(direction){
  		var o=this;
  		switch(direction){ 
- 			case 3:if(o.is_xsup){break};o.is_xsup=true;o.xspeedUp=setInterval(function(){o.moveX+=g},15);break; 
- 			case 2:if(o.is_ysup){break};o.is_ysup=true;o.yspeedUp=setInterval(function(){o.moveY-=g},15);break; 
- 			case 1:if(o.is_xsup){break};o.is_xsup=true;o.xspeedUp=setInterval(function(){o.moveX-=g},15);break; 
+ 			case 3:if(o.is_xsup){break};o.is_xsup=true;o.xspeedUp=setInterval(function(){o.moveX+=g},8);break; 
+ 			case 2:if(o.is_ysup){break};o.is_ysup=true;o.yspeedUp=setInterval(function(){o.moveY-=g},8);break; 
+ 			case 1:if(o.is_xsup){break};o.is_xsup=true;o.xspeedUp=setInterval(function(){o.moveX-=g},8);break; 
  		}
  	}
 
@@ -78,32 +78,37 @@ function initCanvas(CanvasId){
  			case 1:clearInterval(o.xspeedUp);o.is_xsup=false;break; 
  		}
  	}
- 	this.injure=function(){
- 		hp-=10;
- 		if(hp<=20){
- 			alert("Lose");
+ 	this.injure=function(zd){
+ 		this.hp-=10;
+
+ 		if(this.hp<=0){
+ 			this.hp=0;
+ 			gameOver(false);
  		}
+
+ 		setHp(this.hp);
+ 		console.log("injure");
+ 		this.xspeed+=zd.xspeed*0.9;
+ 		this.yspeed+=zd.yspeed*0.9;
  	}
  	this.run=function(){
+ 		if(is_over) return;
+ 		if(this.hp<100){
+ 			this.hp+=1/runTime;
+ 			setHp(this.hp);
+ 		}else{
+ 			gameOver(true);
+ 		}
  		var o=this;
  		o.yspeed+=o.moveY+g;
  		o.moveY=0;
  		o.xspeed+=o.moveX;
  		o.moveX=0;
- 		o.y+=o.yspeed;
+ 		
 
-		//到达顶部
-		if(o.y<0){
-			o.yspeed=0;
-			o.y=0;
-		}else if(o.y>ch-o.h){
-			
-			o.yspeed=0;
-			o.y=ch-o.h;
-		}
-		console.log(o.yspeed);
-		o.xspeed+=(o.xspeed>0?-0.01:0.01);
-		
+
+ 		o.xspeed+=(o.xspeed>0?-0.01:0.01);
+
 
 	/*	//限制最高速度
 		if(o.xspeed>=10){
@@ -112,106 +117,72 @@ function initCanvas(CanvasId){
 			o.xspeed=-10;
 		}
 		*/
-		o.x+=o.xspeed;
 
-		if(o.x>=cw){
-			o.xspeed=0;
 
-			o.x=cw;
-		}else if(o.x<-o.w){
+		//到达顶部
+		if(o.y<10){
+			o.yspeed*=(-0.3);
+			o.y=10;
+		}else if(o.y>ch-o.h){
+			o.yspeed*=(-0.3);
+			o.y=ch-o.h;
+		}
+		o.y+=o.yspeed;
 
-			o.xspeed=0;
+		if(o.x>cw-o.w){
+			o.xspeed*=(-0.3);
+			o.x=cw-o.w;
+		}else if(o.x<0){
+			o.xspeed*=(-0.3);
 			o.x=0;
 		}
+		o.x+=o.xspeed;
+
+		
 
 		o.rect();
 	};
 
 }
 
-/**
- * zaObj 障碍物对象
- *******************************
- * @param x 初始x坐标
- * @param y 初始y坐标
- * @param w 宽度
- * @param h 高度
- * @param xspeed 初始x速度
- * @param yspeed 初始y速度
- *******************************
- * @return zaObj 障碍物对象
- **/
- function zaObj(x,y,w,h,xspeed,yspeed){
-
-
-	Obj.call(this,x,y,w,h,xspeed,yspeed);//效果类似继承，再调用父类方法
-
-	this.check=function(playObj){
-
-		var o=this;
-		if(is_boom(o,playObj)){
-			return 1;
-		}
-		o.x-=xspeed;
-		if(o.x<-o.w){
-			return 2;
-		}
-		o.rect();
-		return 0;
-	}
-
-
-}
-
-var za_top=true;
-
-function getZA(){
-	if(za_top=!za_top){
-		return new zaObj(
-			cw+Math.ceil(Math.random()*80),
-			0,
-			60,
-			120+Math.ceil(Math.random()*20),
-			2,
-			0
-			);
-	}else{
-		return new zaObj(
-			cw+Math.ceil(Math.random()*80),
-			ch-120,
-			60,
-			160,
-			2,
-			0
-			);
-	}
-}
-
 var zdMap=[];
-function zdObj(m){
+function zdObj(m,timeout){
 
+	this.timeout=timeout;
+	this.speed=(m.type==1)?24:18;
+	this.oo=m;
+	Obj.call(this,m.x,m.y,4-m.type,4-m.type);//效果类似继承，再调用父类方法
 	
-	Obj.call(this,m.x,m.y,4,4,0,0);//效果类似继承，再调用父类方法
-	this.speed=10;
 	this.dw=function(mx,my){
-		my=my<100?100:my*1.2;
+		my=my>ch-60?ch-60:my;
 		var cx=mx-this.x;
-		var cy=my-this.y;
+		var cy=(my-this.y)*(Math.random()*0.5+0.8);
 		var cxy=Math.sqrt(cx*cx+cy*cy);
 		this.xspeed=this.speed*cx/cxy;
 		this.yspeed=this.speed*cy/cxy;
 	}
-	this.dw(aPlayer.x,aPlayer.y);
 
 	this.check=function(){
 
 		var o=this;
+		if(o.timeout>=0){
+			o.timeout-=runTime;
+			return 0;
+		}
+		if(o.xspeed==0&&o.yspeed==0){
+
+			o.x=o.oo.x+0.5*o.oo.w;
+			o.y=o.oo.y+0.5*o.oo.h;
+			o.dw(aPlayer.x,aPlayer.y);
+		}
+
+
 		if(is_boom(o)){
 			return 1;
 		}
 		o.x+=o.xspeed;
 		o.y+=o.yspeed;
-		o.yspeed+=g/6;
+		o.yspeed+=g/5;
 		//console.log("zd"+this.y);
 
 		if(o.x<-o.w||o.y<-o.h||o.x>cw||o.y>ch){
@@ -223,16 +194,32 @@ function zdObj(m){
 		}
 	}
 }
+
+function enemyObj(x,y,w,h,xspeed,yspeed){
+	Obj.call(this,x,y,w,h,xspeed,yspeed);//效果类似继承，再调用父类方法
+	
+	this.fire=function(){
+		//console.log("fire");
+		if(is_over) return;
+		var o=this;
+		
+		setTimeout(function(){
+			o.fire();
+		},4000+Math.random()*1000-o.type*2000);
+		zdMap.push(new zdObj(o,0));
+		zdMap.push(new zdObj(o,100));
+		zdMap.push(new zdObj(o,170));
+		zdMap.push(new zdObj(o,220));
+		zdMap.push(new zdObj(o,300));
+	}
+	
+}
 function tankObj(){
-	Obj.call(this,Math.ceil(Math.random()*2)*cw-cw,ch-20,40,20);//效果类似继承，再调用父类方法
-	this.is_fire=false;
+	enemyObj.call(this,Math.ceil(Math.random()*2)*cw-cw,ch-15,30,15);//效果类似继承，再调用父类方法
+	this.type=0;
 	this.run=function(){
 		var o=this;
-		if (o.is_fire) {
-
-			o.rect();
-			return;
-		}
+		
 		if(o.x<-o.w){
 			o.xspeed=Math.random()*5;
 		}else if(o.x>cw){
@@ -250,28 +237,30 @@ function tankObj(){
 
 		o.rect();
 	}
-
-	this.fire=function(){
-		//console.log("fire");
-		var o=this;
-
-		setTimeout(function(){
-			o.fire();
-		},3100);
-		zdMap.push(new zdObj(o));
-		setTimeout(function(){
-			zdMap.push(new zdObj(o));
-		},50);
-		setTimeout(function(){
-			zdMap.push(new zdObj(o));
-		},170);
-		setTimeout(function(){
-			zdMap.push(new zdObj(o));
-		},150);
-		setTimeout(function(){
-			zdMap.push(new zdObj(o));
-		},200);
-	}
 	this.fire();
+	
+}
+function planeObj(){
+	this.type=1;
+	var s=Math.ceil(Math.random()*2)-1;
+	console.log(s);
+	enemyObj.call(this,s*cw,Math.random()*ch/3+100,30,10,(1-s*2)*10);//效果类似继承，再调用父类方法
+
+	this.run=function(){
+		var o=this;
+		if(o.x<-o.w||o.x>cw){
+			s=1-s;
+			this.xspeed=(1-s*2)*10;
+		}
+
+		o.x+=o.xspeed;
+		o.rect(s+1);
+	}
+
+	var o=this;
+
+	setTimeout(function(){
+		o.fire(1);
+	},Math.random()*1000);
 	
 }
