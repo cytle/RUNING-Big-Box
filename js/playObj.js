@@ -31,7 +31,7 @@ function initCanvas(CanvasId){
 	this.h=h?h:0;
 	this.xspeed=xspeed?xspeed:0;
 	this.yspeed=yspeed?yspeed:0;
-
+	this.is_delete=false;
 	this.rect=function(type){
 		drawMap.push([this.x,this.y,this.w,this.h,type?type:0]);
 	}
@@ -53,7 +53,6 @@ function initCanvas(CanvasId){
  function playObj(x,y,w,h,xspeed,yspeed){
 
  	Obj.call(this,x,y,w,h,xspeed,yspeed);//效果类似继承，再调用父类方法
- 	this.direction=1;
  	this.moveX=0;
  	this.moveY=0;
  	this.yspeedUp;
@@ -66,7 +65,7 @@ function initCanvas(CanvasId){
  		switch(direction){ 
  			case 3:if(o.is_xsup){break};o.is_xsup=true;o.xspeedUp=setInterval(function(){o.moveX+=g},8);break; 
  			case 2:if(o.is_ysup){break};o.is_ysup=true;o.yspeedUp=setInterval(function(){o.moveY-=g},8);break; 
- 			case 1:if(o.is_xsup){break};o.is_xsup=true;o.xspeedUp=setInterval(function(){o.moveX-=g},8);break; 
+ 			case 1:if(o.is_xsup){break};o.is_xsup=true;o.xspeedUp=setInterval(function(){o.moveX-=g},8);console.log(1);break; 
  		}
  	}
 
@@ -153,13 +152,17 @@ function zdObj(m,timeout){
 	this.oo=m;
 	Obj.call(this,m.x,m.y,4-m.type,4-m.type);//效果类似继承，再调用父类方法
 	
+	//子弹定位，mx，my目标位置
 	this.dw=function(mx,my){
+		var o=this;
+		o.x=o.oo.x+0.5*o.oo.w;
+		o.y=o.oo.y+0.5*o.oo.h;
 		my=my>ch-60?ch-60:my;
-		var cx=mx-this.x;
-		var cy=(my-this.y)*(Math.random()*0.5+0.8);
+		var cx=mx-o.x;
+		var cy=(my-o.y)*(Math.random()*0.5+0.8);
 		var cxy=Math.sqrt(cx*cx+cy*cy);
-		this.xspeed=this.speed*cx/cxy;
-		this.yspeed=this.speed*cy/cxy;
+		this.xspeed=o.speed*cx/cxy;
+		this.yspeed=o.speed*cy/cxy;
 	}
 
 	this.check=function(){
@@ -170,23 +173,19 @@ function zdObj(m,timeout){
 			return 0;
 		}
 		if(o.xspeed==0&&o.yspeed==0){
-
-			o.x=o.oo.x+0.5*o.oo.w;
-			o.y=o.oo.y+0.5*o.oo.h;
 			o.dw(aPlayer.x,aPlayer.y);
 		}
-
 
 		if(is_boom(o)){
 			return 1;
 		}
 		o.x+=o.xspeed;
 		o.y+=o.yspeed;
-		o.yspeed+=g/5;
+		o.yspeed+=g/5; //子弹重力
 		//console.log("zd"+this.y);
 
+		//边缘检测
 		if(o.x<-o.w||o.y<-o.h||o.x>cw||o.y>ch){
-			//console.log("xspeed:"+o.xspeed+"x:"+o.x+";y:"+o.y+";w:"+o.w+";h:"+o.h+";cw:"+cw+";ch:"+ch);
 			return 2;
 		}else{
 			o.rect();
@@ -198,9 +197,10 @@ function zdObj(m,timeout){
 function enemyObj(x,y,w,h,xspeed,yspeed){
 	Obj.call(this,x,y,w,h,xspeed,yspeed);//效果类似继承，再调用父类方法
 	
+	//发射子弹
 	this.fire=function(){
 		//console.log("fire");
-		if(is_over) return;
+		if(is_over||this.is_delete) return;
 		var o=this;
 		
 		setTimeout(function(){
@@ -219,20 +219,21 @@ function tankObj(){
 	this.type=0;
 	this.run=function(){
 		var o=this;
-		
+		//边界检测
 		if(o.x<-o.w){
 			o.xspeed=Math.random()*5;
 		}else if(o.x>cw){
 			//console.log(o.x)
 			o.xspeed=-Math.random()*5;
 		}
+
+		//移动
 		o.x+=o.xspeed;
 
+		//阻力减速
 		o.xspeed+=(o.xspeed>0?-0.01:0.01);
 		if(Math.abs(o.xspeed)<=0.01){
-			
 			o.xspeed=5-Math.random()*10;
-			
 		}
 
 		o.rect();
@@ -248,6 +249,8 @@ function planeObj(){
 
 	this.run=function(){
 		var o=this;
+
+		//边界检测
 		if(o.x<-o.w||o.x>cw){
 			s=1-s;
 			this.xspeed=(1-s*2)*10;

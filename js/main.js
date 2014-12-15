@@ -97,8 +97,14 @@
 
 	var is_over=false;
 	function gameStart(){
-		enemyMap=[];
+		var temp;
+		while(temp=enemyMap.shift()){
+			temp.is_delete=true;
+			delete temp; 
+		}
+
 		zdMap=[];
+		
 		aPlayer=new playObj((cx.width-7)/2,400,10,25);
 		game_over.style.display="none";
 		clearInterval(intervalD);
@@ -112,26 +118,13 @@
 	function gameOver(is_win){
 		result_say.innerHTML=is_win?"Win!":"Lose!";
 		is_over=true;
-		zdMap=[];
+		var temp;
+		while(temp=zdMap.shift()){
+			temp.is_delete=true;
+			delete temp; 
+		}
 		game_over.style.display="block";
 
 
 	}
 
-
-/*
-
-		function bg_hz(){
-		for(var i=0;i<map.length;i++){ 
-			//0正常 1撞到 2障碍到边界
-			switch(map[i].check(aPlayer)){
-				case 0:break;
-				case 1:alert("撞到！");clearInterval(intervalD);clearInterval(intervalRZ);break;
-				case 2:map.shift();break;
-			}
-			
-		}
-	}
-	function rand_za(){
-		map.push(getZA());
-	}*/
