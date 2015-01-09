@@ -91,13 +91,21 @@ function setFps(){
 
 	fps.innerHTML="fps:"+fps_num;
 	fps_num=0;
+	setZdAmount();
 }
 function setHistory(){
 
 	if(!history)
 		history=document.getElementById('injure_history');
 
-	injure_history.innerHTML=injure_history.innerHTML+"<br>injure:x:"+aPlayerX+" y:"+aPlayerY;
+	//injure_history.innerHTML=injure_history.innerHTML+"<br>injure:x:"+aPlayerX+" y:"+aPlayerY;
+
+}
+function setZdAmount(){
+	if(!zdAmount)
+		zdAmount=document.getElementById('zdAmount');
+	zdAmount.innerHTML="子弹数量:"+zdMap.length;
+	//injure_history.innerHTML=injure_history.innerHTML+"<br>injure:x:"+aPlayerX+" y:"+aPlayerY;
 
 }
 

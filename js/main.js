@@ -5,7 +5,7 @@
 
 	var intervalD ,intervalRZ ;//定时执行
 	var aPlayer;
-	var game_over,result_say,hp_line,hp,fps,history,fps_num=0;
+	var game_over,result_say,hp_line,hp,fps,zdAmount,history,fps_num=0;
 
 	window.onload=function(){
 		initCanvas("myCanvas");//初始画布

@@ -1,9 +1,24 @@
-var runTime=10;//每次运行时间
+/*
+飞机子弹速度+方块速度<min(方块高度,方块宽度)
+100g+speedMax<10
+g=9.8/rFtp
+rFtp=900/runTime
+↓
+g<0.05
+0.05>9.8/rFtp
+↓
+rFtp>196
+900/runTime>196
+↓
+runTime<4.5918
+*/
+
+var runTime=5;//每次运行时间
 var rFtp=900/runTime;//平均帧数
 var g=9.8/rFtp;
 var cx,cw,ch,cxt;
 var drawMap=[];
-
+var speedMax=70*g;
 var aPlayerX=0,aPlayerY=0,aPlayerXW=0,aPlayerYH=0;
 function initCanvas(CanvasId){
 	cx=document.getElementById(CanvasId); //画板
@@ -70,7 +85,7 @@ function initCanvas(CanvasId){
  		var o=this;
  		switch(direction){ 
  			case 3:if(o.is_xsup){break};o.is_xsup=true;o.xspeedUp=setInterval(function(){o.moveX+=g},runTime);break; 
- 			case 2:if(o.is_ysup){break};o.is_ysup=true;o.yspeedUp=setInterval(function(){o.moveY-=1.5*g},runTime);break; 
+ 			case 2:if(o.is_ysup){break};o.is_ysup=true;o.yspeedUp=setInterval(function(){o.moveY-=g},runTime);break; 
  			case 1:if(o.is_xsup){break};o.is_xsup=true;o.xspeedUp=setInterval(function(){o.moveX-=g},runTime);console.log(1);break; 
  			default:console.error("playObj setKeyDown switch default value:"+direction);
  		}
@@ -98,7 +113,7 @@ function initCanvas(CanvasId){
  		}
 
  		setHp(this.hp);
- 		setHistory();
+ 		//setHistory();
  		console.log("injure");
  		this.xspeed+=zd.xspeed*0.9;
  		this.yspeed+=zd.yspeed*0.9;
@@ -123,7 +138,7 @@ function initCanvas(CanvasId){
  		aPlayerYH=aPlayerY+o.h;
  		
  		o.rect();
- 		o.yspeed+=o.moveY+g;
+ 		o.yspeed+=o.moveY+g/2;
  		o.moveY=0;
  		o.xspeed+=o.moveX;
  		o.moveX=0;
@@ -131,13 +146,18 @@ function initCanvas(CanvasId){
  		o.xspeed+=(o.xspeed>0?-0.01:0.01);
 
 
-	/*	//限制最高速度
-		if(o.xspeed>=10){
-			o.xspeed=10;
-		}else if(o.xspeed<=-10){
-			o.xspeed=-10;
+		//限制最高速度
+		if(o.xspeed>=speedMax){
+			o.xspeed=speedMax;
+		}else if(o.xspeed<=-speedMax){
+			o.xspeed=-speedMax;
 		}
-		*/
+		if(o.yspeed>=speedMax){
+			o.yspeed=speedMax;
+		}else if(o.yspeed<=-speedMax){
+			o.yspeed=-speedMax;
+		}
+		
 
 
 		//到达顶部
@@ -192,6 +212,7 @@ function zdObj(m,timeout){
 	//子弹定位，mx，my目标位置
 	this.dw=function(mx,my){
 		var o=this;
+
 		o.x=o.oo.x+0.5*o.oo.w;
 		o.y=o.oo.y+0.5*o.oo.h;
 		my=my>ch-60?ch-60:my;
@@ -211,16 +232,18 @@ function zdObj(m,timeout){
 			return 0;
 		}
 		if(o.no_fired){
+
 			o.dw(aPlayer.x,aPlayer.y);
 			o.no_fired=false;
 		}
+
 		o.rect();
 		if(is_boom(o)){
 			return 1;
 		}
 		o.x+=o.xspeed;
 		o.y+=o.yspeed;
-		o.yspeed+=g/10; //子弹重力
+		o.yspeed+=g/15; //子弹重力
 		//console.log("zd"+this.y);
 
 		//边缘检测
@@ -259,19 +282,19 @@ function tankObj(){
 		var o=this;
 		//边界检测
 		if(o.x<-o.w){
-			o.xspeed=Math.random()*5;
+			o.xspeed=Math.random()*100*g;
 		}else if(o.x>cw){
 			//console.log(o.x)
-			o.xspeed=-Math.random()*5;
+			o.xspeed=-Math.random()*100*g;
 		}
 
 		//移动
 		o.x+=o.xspeed;
 
 		//阻力减速
-		o.xspeed+=(o.xspeed>0?-0.01:0.01);
-		if(Math.abs(o.xspeed)<=0.01){
-			o.xspeed=5-Math.random()*10;
+		o.xspeed+=(o.xspeed>0?-g/10:g/10);
+		if(Math.abs(o.xspeed)<=g/10){
+			o.xspeed=(70-Math.random()*140)*g;
 		}
 
 		o.rect();
