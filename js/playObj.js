@@ -1,12 +1,15 @@
 var cx,cw,ch,cxt;
-var drawMap=[]
+var drawMap=[];
 var g=0.2;
+var aPlayerX=0,aPlayerY=0,aPlayerXW=0,aPlayerYH=0;
 function initCanvas(CanvasId){
-	cx=document.getElementById(CanvasId);//画板
+	cx=document.getElementById(CanvasId); //画板
 	
 	cx.height=document.body.offsetHeight;
 	cx.width=document.body.offsetWidth;
-	cw=cx.width;ch=cx.height;cxt=cx.getContext("2d");
+	cw=cx.width;
+	ch=cx.height;
+	cxt=cx.getContext("2d");
 	cxt.fillStyle = "#006699";
 }
 /**
@@ -34,7 +37,7 @@ function initCanvas(CanvasId){
 	this.is_delete=false;
 	this.rect=function(type){
 		drawMap.push([this.x,this.y,this.w,this.h,type?type:0]);
-	}
+	};
 }
 
 
@@ -66,8 +69,9 @@ function initCanvas(CanvasId){
  			case 3:if(o.is_xsup){break};o.is_xsup=true;o.xspeedUp=setInterval(function(){o.moveX+=g},8);break; 
  			case 2:if(o.is_ysup){break};o.is_ysup=true;o.yspeedUp=setInterval(function(){o.moveY-=g},8);break; 
  			case 1:if(o.is_xsup){break};o.is_xsup=true;o.xspeedUp=setInterval(function(){o.moveX-=g},8);console.log(1);break; 
+ 			default:console.error("playObj setKeyDown switch default value:"+direction);
  		}
- 	}
+ 	};
 
  	this.setKeyUp=function(direction){
  		var o=this;
@@ -75,8 +79,9 @@ function initCanvas(CanvasId){
  			case 3:clearInterval(o.xspeedUp);o.is_xsup=false;break; 
  			case 2:clearInterval(o.yspeedUp);o.is_ysup=false;break; 
  			case 1:clearInterval(o.xspeedUp);o.is_xsup=false;break; 
+ 			default:console.error("playObj setKeyUp switch default value:"+direction);
  		}
- 	}
+ 	};
  	this.injure=function(zd){
  		this.hp-=10;
 
@@ -89,7 +94,7 @@ function initCanvas(CanvasId){
  		console.log("injure");
  		this.xspeed+=zd.xspeed*0.9;
  		this.yspeed+=zd.yspeed*0.9;
- 	}
+ 	};
  	this.run=function(){
  		if(is_over) return;
  		if(this.hp<100){
@@ -99,13 +104,17 @@ function initCanvas(CanvasId){
  			gameOver(true);
  		}
  		var o=this;
+ 		aPlayerX=o.x;
+ 		aPlayerY=o.y;
+ 		aPlayerXW=o.x+o.w;
+ 		aPlayerYH=o.y+o.h;
+ 		
+ 		o.rect();
  		o.yspeed+=o.moveY+g;
  		o.moveY=0;
  		o.xspeed+=o.moveX;
  		o.moveX=0;
  		
-
-
  		o.xspeed+=(o.xspeed>0?-0.01:0.01);
 
 
@@ -139,7 +148,7 @@ function initCanvas(CanvasId){
 
 		
 
-		o.rect();
+		
 	};
 
 }
@@ -151,7 +160,7 @@ function zdObj(m,timeout){
 	this.speed=(m.type==1)?24:18;
 	this.oo=m;
 	Obj.call(this,m.x,m.y,4-m.type,4-m.type);//效果类似继承，再调用父类方法
-	
+	this.no_fired=true;
 	//子弹定位，mx，my目标位置
 	this.dw=function(mx,my){
 		var o=this;
@@ -168,14 +177,16 @@ function zdObj(m,timeout){
 	this.check=function(){
 
 		var o=this;
+
 		if(o.timeout>=0){
 			o.timeout-=runTime;
 			return 0;
 		}
-		if(o.xspeed==0&&o.yspeed==0){
+		if(o.no_fired){
 			o.dw(aPlayer.x,aPlayer.y);
+			o.no_fired=false;
 		}
-
+		o.rect();
 		if(is_boom(o)){
 			return 1;
 		}
@@ -188,7 +199,6 @@ function zdObj(m,timeout){
 		if(o.x<-o.w||o.y<-o.h||o.x>cw||o.y>ch){
 			return 2;
 		}else{
-			o.rect();
 			return 0;
 		}
 	}

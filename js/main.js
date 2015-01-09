@@ -7,6 +7,8 @@
 	var aPlayer;
 	var game_over,result_say,hp_line,hp,fps,fps_num=0;
 	var runTime=25;//每次运行时间
+
+
 	window.onload=function(){
 		initCanvas("myCanvas");//初始画布
 
@@ -23,7 +25,7 @@
 		gameStart();
 
 		window.setInterval(setFps,1000);
-		document.onkeydown = function(e) { //改变蛇方向 
+		document.onkeydown = function(e) { //改变方向 
 			
 			if(e.keyCode==37||e.keyCode==38||e.keyCode==39){
 				aPlayer.setKeyDown(e.keyCode - 36);
@@ -31,7 +33,7 @@
 			}
 		}
 
-		document.onkeyup = function(e) { //改变蛇方向 
+		document.onkeyup = function(e) { //改变方向 
 			
 			if(e.keyCode==37||e.keyCode==38||e.keyCode==39){
 				aPlayer.setKeyUp(e.keyCode - 36);
@@ -64,7 +66,7 @@
 		while(temp=tempMap.shift()){
 			switch(temp.check()){
 				case 0:zdMap.push(temp);break;
-				case 1:aPlayer.injure(temp);break;
+				case 1:aPlayer.injure(temp);temp=null;break;
 				case 2:break;
 			}
 		}
@@ -87,9 +89,9 @@
 	}
 
 	function gameRun(){
+		aPlayer.run();
 		enemyRun();
 		zdRun();
-		aPlayer.run();
 		drawC();
 		fps_num++;
 		intervalD=setTimeout(gameRun,runTime);

@@ -6,9 +6,12 @@
 *******************************
 * @return boolean 是否碰撞
 **/
-function is_boom(n,m){
-	m=m?m:aPlayer;
-	return (n.x>=m.x&&n.x<=(m.x+m.w)&& n.y>=m.y&& n.y<=(m.y+m.h));
+
+/* 
+* TODO 依照轨迹再判断
+*/ 
+function is_boom(n){
+	return (n.x>=aPlayerX&&n.x<=aPlayerXW&& n.y>=aPlayerY&& n.y<=aPlayerYH);
 }
 
 
@@ -31,6 +34,7 @@ function drawC(){
 			break;
 			case 2:rectPlane2(d);
 			break;
+			default:;
 		}
 	}
 }
