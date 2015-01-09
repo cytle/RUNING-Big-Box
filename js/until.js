@@ -92,3 +92,12 @@ function setFps(){
 	fps.innerHTML="fps:"+fps_num;
 	fps_num=0;
 }
+function setHistory(){
+
+	if(!history)
+		history=document.getElementById('injure_history');
+
+	injure_history.innerHTML=injure_history.innerHTML+"<br>injure:x:"+aPlayerX+" y:"+aPlayerY;
+
+}
+

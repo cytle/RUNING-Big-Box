@@ -5,9 +5,7 @@
 
 	var intervalD ,intervalRZ ;//定时执行
 	var aPlayer;
-	var game_over,result_say,hp_line,hp,fps,fps_num=0;
-	var runTime=25;//每次运行时间
-
+	var game_over,result_say,hp_line,hp,fps,history,fps_num=0;
 
 	window.onload=function(){
 		initCanvas("myCanvas");//初始画布
@@ -106,8 +104,10 @@
 		}
 
 		zdMap=[];
-		
-		aPlayer=new playObj((cx.width-7)/2,400,10,25);
+		if(!aPlayer)
+			aPlayer=new playObj((cw-10)/2,(ch-25)/2,10,25);
+		else
+			aPlayer.init();
 		game_over.style.display="none";
 		clearInterval(intervalD);
 		clearInterval(intervalRZ);
@@ -118,15 +118,18 @@
 
 	}
 	function gameOver(is_win){
-		result_say.innerHTML=is_win?"Win!":"Lose!";
 		is_over=true;
+		aPlayer.init();
 		var temp;
 		while(temp=zdMap.shift()){
 			temp.is_delete=true;
 			delete temp; 
 		}
-		game_over.style.display="block";
 
+		game_over.style.display="block";
+		
+
+		result_say.innerHTML=is_win?"Win!":"Lose!";
 
 	}
 

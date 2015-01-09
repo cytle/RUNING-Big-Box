@@ -1,6 +1,9 @@
+var runTime=10;//每次运行时间
+var rFtp=900/runTime;//平均帧数
+var g=9.8/rFtp;
 var cx,cw,ch,cxt;
 var drawMap=[];
-var g=0.2;
+
 var aPlayerX=0,aPlayerY=0,aPlayerXW=0,aPlayerYH=0;
 function initCanvas(CanvasId){
 	cx=document.getElementById(CanvasId); //画板
@@ -56,8 +59,8 @@ function initCanvas(CanvasId){
  function playObj(x,y,w,h,xspeed,yspeed){
 
  	Obj.call(this,x,y,w,h,xspeed,yspeed);//效果类似继承，再调用父类方法
- 	this.moveX=0;
- 	this.moveY=0;
+ 	this.moveX=0;//加速
+ 	this.moveY=0;//加速
  	this.yspeedUp;
  	this.xspeedUp;
  	this.is_ysup=false;
@@ -66,9 +69,9 @@ function initCanvas(CanvasId){
  	this.setKeyDown=function(direction){
  		var o=this;
  		switch(direction){ 
- 			case 3:if(o.is_xsup){break};o.is_xsup=true;o.xspeedUp=setInterval(function(){o.moveX+=g},8);break; 
- 			case 2:if(o.is_ysup){break};o.is_ysup=true;o.yspeedUp=setInterval(function(){o.moveY-=g},8);break; 
- 			case 1:if(o.is_xsup){break};o.is_xsup=true;o.xspeedUp=setInterval(function(){o.moveX-=g},8);console.log(1);break; 
+ 			case 3:if(o.is_xsup){break};o.is_xsup=true;o.xspeedUp=setInterval(function(){o.moveX+=g},runTime);break; 
+ 			case 2:if(o.is_ysup){break};o.is_ysup=true;o.yspeedUp=setInterval(function(){o.moveY-=1.5*g},runTime);break; 
+ 			case 1:if(o.is_xsup){break};o.is_xsup=true;o.xspeedUp=setInterval(function(){o.moveX-=g},runTime);console.log(1);break; 
  			default:console.error("playObj setKeyDown switch default value:"+direction);
  		}
  	};
@@ -83,31 +86,41 @@ function initCanvas(CanvasId){
  		}
  	};
  	this.injure=function(zd){
+ 		if(is_over){
+ 			return;
+ 		}
  		this.hp-=10;
 
  		if(this.hp<=0){
  			this.hp=0;
+ 			setHp(this.hp);
  			gameOver(false);
  		}
 
  		setHp(this.hp);
+ 		setHistory();
  		console.log("injure");
  		this.xspeed+=zd.xspeed*0.9;
  		this.yspeed+=zd.yspeed*0.9;
  	};
  	this.run=function(){
- 		if(is_over) return;
- 		if(this.hp<100){
- 			this.hp+=1/runTime;
- 			setHp(this.hp);
+
+ 		var o=this;
+ 		if(is_over){
+ 			o.rect();
+ 			return;
+ 		}
+
+ 		if(o.hp<100){
+ 			o.hp+=runTime/1000;
+ 			setHp(o.hp);
  		}else{
  			gameOver(true);
  		}
- 		var o=this;
- 		aPlayerX=o.x;
- 		aPlayerY=o.y;
- 		aPlayerXW=o.x+o.w;
- 		aPlayerYH=o.y+o.h;
+ 		aPlayerX=Math.round(o.x*100)/100;
+ 		aPlayerY=Math.round(o.y*100)/100;
+ 		aPlayerXW=aPlayerX+o.w;
+ 		aPlayerYH=aPlayerY+o.h;
  		
  		o.rect();
  		o.yspeed+=o.moveY+g;
@@ -150,6 +163,21 @@ function initCanvas(CanvasId){
 
 		
 	};
+	this.init=function(){
+		var o=this;
+
+		clearInterval(o.xspeedUp);
+		clearInterval(o.yspeedUp);
+		o.x=(cw-o.w)/2;
+		o.y=(ch-o.h)/2;
+		o.rect();
+		o.moveX=0;
+		o.moveY=0;
+		o.yspeed=0;
+		o.xspeed=0;
+		o.hp=0;
+		setHp(o.hp);
+	};
 
 }
 
@@ -157,7 +185,7 @@ var zdMap=[];
 function zdObj(m,timeout){
 
 	this.timeout=timeout;
-	this.speed=(m.type==1)?24:18;
+	this.speed=(m.type==1)?100*g:70*g;
 	this.oo=m;
 	Obj.call(this,m.x,m.y,4-m.type,4-m.type);//效果类似继承，再调用父类方法
 	this.no_fired=true;
@@ -192,7 +220,7 @@ function zdObj(m,timeout){
 		}
 		o.x+=o.xspeed;
 		o.y+=o.yspeed;
-		o.yspeed+=g/5; //子弹重力
+		o.yspeed+=g/10; //子弹重力
 		//console.log("zd"+this.y);
 
 		//边缘检测
@@ -254,8 +282,8 @@ function tankObj(){
 function planeObj(){
 	this.type=1;
 	var s=Math.ceil(Math.random()*2)-1;
-	console.log(s);
-	enemyObj.call(this,s*cw,Math.random()*ch/3+100,30,10,(1-s*2)*10);//效果类似继承，再调用父类方法
+	//console.log(s);
+	enemyObj.call(this,s*cw,Math.random()*ch/3+100,30,10,(1-s*2)*400/rFtp);//效果类似继承，再调用父类方法
 
 	this.run=function(){
 		var o=this;
@@ -263,7 +291,7 @@ function planeObj(){
 		//边界检测
 		if(o.x<-o.w||o.x>cw){
 			s=1-s;
-			this.xspeed=(1-s*2)*10;
+			this.xspeed=(1-s*2)*400/rFtp;
 		}
 
 		o.x+=o.xspeed;
