@@ -14,14 +14,11 @@
 		result_say = document.getElementById("result_say");
 
 		hp_line = document.getElementById("hp_line");
-		hp_line.style.left=(cx.width-hp_line.offsetWidth)/2+"px";
-
-
-
+		
 		var d=[40,40,50,15,1]
 		//rectPlane(d);
 		gameStart();
-
+		gameHelp();
 		window.setInterval(setFps,1000);
 		document.onkeydown = function(e) { //改变方向 
 			
@@ -124,12 +121,22 @@
 		while(temp=zdMap.shift()){
 			temp.is_delete=true;
 			delete temp; 
-		}
+		};
 
 		game_over.style.display="block";
-		
+		game_over.innerHTML='<div id="result"><span id="result_say">'+(is_win?"Win!":"Lose!")+'</span> <small>按R键重新开始</small></div>';
 
-		result_say.innerHTML=is_win?"Win!":"Lose!";
+	}
+	function gameHelp(){
+		is_over=true;
+		aPlayer.init();
+		var temp;
+		while(temp=zdMap.shift()){
+			temp.is_delete=true;
+			delete temp; 
+		};
 
+		game_over.style.display="block";
+		//game_over.innerHTML='<div id="result"><span id="result_say">'+(is_win?"Win!":"Lose!")+'</span> <small>按R键重新开始</small></div>';
 	}
 

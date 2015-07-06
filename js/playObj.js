@@ -78,7 +78,7 @@ function initCanvas(CanvasId){
  	this.moveY=0;//加速
  	this.yspeedUp;
  	this.xspeedUp;
- 	this.is_ysup=false;
+ 	this.is_ysup=false;  
  	this.is_xsup=false;
  	this.hp=0;
  	this.setKeyDown=function(direction){
