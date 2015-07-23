@@ -1,35 +1,4 @@
-/*
-飞机子弹速度+方块速度<min(方块高度,方块宽度)
-100g+speedMax<10
-g=9.8/rFtp
-rFtp=900/runTime
-↓
-g<0.05
-0.05>9.8/rFtp
-↓
-rFtp>196
-900/runTime>196
-↓
-runTime<4.5918
-*/
 
-var runTime=5;//每次运行时间
-var rFtp=900/runTime;//平均帧数
-var g=9.8/rFtp;
-var cx,cw,ch,cxt;
-var drawMap=[];
-var speedMax=70*g;
-var aPlayerX=0,aPlayerY=0,aPlayerXW=0,aPlayerYH=0;
-function initCanvas(CanvasId){
-	cx=document.getElementById(CanvasId); //画板
-	
-	cx.height=document.body.offsetHeight;
-	cx.width=document.body.offsetWidth;
-	cw=cx.width;
-	ch=cx.height;
-	cxt=cx.getContext("2d");
-	cxt.fillStyle = "#006699";
-}
 /**
  * Obj 游戏对象
  *******************************
@@ -41,7 +10,7 @@ function initCanvas(CanvasId){
  * @param yspeed 初始y速度
  *******************************
  * @return Obj 游戏对象
- **/
+ */
  function Obj(x,y,w,h,xspeed,yspeed){
 	/*
 	console.log("call Obj");*/
@@ -53,9 +22,16 @@ function initCanvas(CanvasId){
 	this.xspeed=xspeed?xspeed:0;
 	this.yspeed=yspeed?yspeed:0;
 	this.is_delete=false;
+	this.lx=this.x;
+	this.ly=this.y;
 	this.rect=function(type){
-		drawMap.push([this.x,this.y,this.w,this.h,type?type:0]);
+		game.draw([this.x,this.y,this.w,this.h,type?type:0]);
+		this.lx=this.x;
+		this.ly=this.y;
 	};
+	this.log=function(){
+		console.log(this.constructor.name+"  "+"x:"+this.x+"y:"+this.y);
+	}
 }
 
 
@@ -70,58 +46,57 @@ function initCanvas(CanvasId){
  * @param yspeed 初始y速度
  *******************************
  * @return playObj 玩家对象
- **/
- function playObj(x,y,w,h,xspeed,yspeed){
+ */
+ function playObj(){
 
- 	Obj.call(this,x,y,w,h,xspeed,yspeed);//效果类似继承，再调用父类方法
- 	this.moveX=0;//加速
- 	this.moveY=0;//加速
- 	this.yspeedUp;
- 	this.xspeedUp;
- 	this.is_ysup=false;  
- 	this.is_xsup=false;
- 	this.hp=0;
- 	this.setKeyDown=function(direction){
- 		var o=this;
+ 	var o=this;
+ 	Obj.call(o,0,0,playerW,playerH);//效果类似继承，再调用父类方法
+ 	o.moveX=0;//加速
+ 	o.moveY=0;//加速
+ 	o.yspeedUp;
+ 	o.xspeedUp;
+ 	o.sixLine;
+ 	var is_ysup=false;  //检查上下是否按下
+ 	var is_xsup=false;	//检查左右是否按下
+ 	o.hp=0;
+ 	o.setKeyDown=function(direction){
  		switch(direction){ 
- 			case 3:if(o.is_xsup){break};o.is_xsup=true;o.xspeedUp=setInterval(function(){o.moveX+=g},runTime);break; 
- 			case 2:if(o.is_ysup){break};o.is_ysup=true;o.yspeedUp=setInterval(function(){o.moveY-=g},runTime);break; 
- 			case 1:if(o.is_xsup){break};o.is_xsup=true;o.xspeedUp=setInterval(function(){o.moveX-=g},runTime);console.log(1);break; 
+ 			case 3:if(is_xsup){break};is_xsup=true;o.xspeedUp=setInterval(function(){o.moveX+=g},runTime);break; 
+ 			case 2:if(is_ysup){break};is_ysup=true;o.yspeedUp=setInterval(function(){o.moveY-=g},runTime);break; 
+ 			case 1:if(is_xsup){break};is_xsup=true;o.xspeedUp=setInterval(function(){o.moveX-=g},runTime);console.log(1);break; 
  			default:console.error("playObj setKeyDown switch default value:"+direction);
  		}
  	};
 
- 	this.setKeyUp=function(direction){
- 		var o=this;
+ 	o.setKeyUp=function(direction){
  		switch(direction){ 
- 			case 3:clearInterval(o.xspeedUp);o.is_xsup=false;break; 
- 			case 2:clearInterval(o.yspeedUp);o.is_ysup=false;break; 
- 			case 1:clearInterval(o.xspeedUp);o.is_xsup=false;break; 
+ 			case 3:clearInterval(o.xspeedUp);is_xsup=false;break; 
+ 			case 2:clearInterval(o.yspeedUp);is_ysup=false;break; 
+ 			case 1:clearInterval(o.xspeedUp);is_xsup=false;break; 
  			default:console.error("playObj setKeyUp switch default value:"+direction);
  		}
  	};
- 	this.injure=function(zd){
- 		if(is_over){
+ 	o.injure=function(zd){
+ 		if(game.isOver()){
  			return;
  		}
- 		this.hp-=10;
+ 		o.hp-=0;
 
- 		if(this.hp<=0){
- 			this.hp=0;
- 			setHp(this.hp);
- 			gameOver(false);
+ 		if(o.hp<=0){
+ 			o.hp=0;
+ 			setHp(o.hp);
+ 			game.over(false);
  		}
 
- 		setHp(this.hp);
+ 		setHp(o.hp);
  		//setHistory();
  		console.log("injure");
- 		this.xspeed+=zd.xspeed*0.9;
- 		this.yspeed+=zd.yspeed*0.9;
+ 		o.xspeed+=zd.xspeed*0.9;
+ 		o.yspeed+=zd.yspeed*0.9;
  	};
- 	this.run=function(){
+ 	o.run=function(){
 
- 		var o=this;
- 		if(is_over){
+ 		if(game.isOver()){
  			o.rect();
  			return;
  		}
@@ -130,14 +105,9 @@ function initCanvas(CanvasId){
  			o.hp+=runTime/1000;
  			setHp(o.hp);
  		}else{
- 			gameOver(true);
+ 			game.over(true);
  		}
- 		aPlayerX=Math.round(o.x*100)/100;
- 		aPlayerY=Math.round(o.y*100)/100;
- 		aPlayerXW=aPlayerX+o.w;
- 		aPlayerYH=aPlayerY+o.h;
  		
- 		o.rect();
  		o.yspeed+=o.moveY+g/2;
  		o.moveY=0;
  		o.xspeed+=o.moveX;
@@ -164,32 +134,31 @@ function initCanvas(CanvasId){
 		if(o.y<10){
 			o.yspeed*=(-0.3);
 			o.y=10;
-		}else if(o.y>ch-o.h){
+		}else if(o.y>game.ch-o.h){
 			o.yspeed*=(-0.3);
-			o.y=ch-o.h;
+			o.y=game.ch-o.h;
 		}
 		o.y+=o.yspeed;
 
-		if(o.x>cw-o.w){
+		if(o.x>game.cw-o.w){
 			o.xspeed*=(-0.3);
-			o.x=cw-o.w;
+			o.x=game.cw-o.w;
 		}else if(o.x<0){
 			o.xspeed*=(-0.3);
 			o.x=0;
 		}
 		o.x+=o.xspeed;
 
-		
-
-		
+		o.sixLine=getSixLine(o.x,o.y,o.lx,o.ly,o.w,o.h);
+		o.rect();
 	};
-	this.init=function(){
-		var o=this;
+	o.init=function(){
 
 		clearInterval(o.xspeedUp);
 		clearInterval(o.yspeedUp);
-		o.x=(cw-o.w)/2;
-		o.y=(ch-o.h)/2;
+
+		o.x=(game.cw-o.w)/2;
+		o.y=(game.ch-o.h)/2;
 		o.rect();
 		o.moveX=0;
 		o.moveY=0;
@@ -198,56 +167,57 @@ function initCanvas(CanvasId){
 		o.hp=0;
 		setHp(o.hp);
 	};
+	function setHp(h){
+		hp.style.width=h+"%";
+	}
+	function setHistory(){
+		//injure_history.innerHTML=injure_history.innerHTML+"<br>injure:x:"+aPlayerX+" y:"+aPlayerY;
 
+	}
 }
 
-var zdMap=[];
 function zdObj(m,timeout){
-
-	this.timeout=timeout;
-	this.speed=(m.type==1)?100*g:70*g;
-	this.oo=m;
-	Obj.call(this,m.x,m.y,4-m.type,4-m.type);//效果类似继承，再调用父类方法
-	this.no_fired=true;
+	var o=this;
+	o.timeout=timeout;
+	o.speed=(m.type==1)?100*g:70*g;
+	o.oo=m;
+	Obj.call(o,m.x,m.y,4-m.type,4-m.type);//效果类似继承，再调用父类方法
+	o.no_fired=true;
 	//子弹定位，mx，my目标位置
-	this.dw=function(mx,my){
-		var o=this;
+	o.dw=function(mx,my){
 
 		o.x=o.oo.x+0.5*o.oo.w;
 		o.y=o.oo.y+0.5*o.oo.h;
-		my=my>ch-60?ch-60:my;
+		my=my>game.ch-60?game.ch-60:my;
 		var cx=mx-o.x;
 		var cy=(my-o.y)*(Math.random()*0.5+0.8);
 		var cxy=Math.sqrt(cx*cx+cy*cy);
-		this.xspeed=o.speed*cx/cxy;
-		this.yspeed=o.speed*cy/cxy;
+		o.xspeed=o.speed*cx/cxy;
+		o.yspeed=o.speed*cy/cxy;
 	}
 
-	this.check=function(){
-
-		var o=this;
+	o.check=function(){
 
 		if(o.timeout>=0){
 			o.timeout-=runTime;
 			return 0;
 		}
 		if(o.no_fired){
-
-			o.dw(aPlayer.x,aPlayer.y);
+			o.dw(game.getPlayer().x,game.getPlayer().y);
 			o.no_fired=false;
 		}
 
-		o.rect();
-		if(is_boom(o)){
-			return 1;
-		}
 		o.x+=o.xspeed;
 		o.y+=o.yspeed;
+		if(is_boom(o,game.getPlayer())){
+			return 1;
+		}
+		o.rect();
 		o.yspeed+=g/15; //子弹重力
-		//console.log("zd"+this.y);
+		//console.log("zd"+o.y);
 
 		//边缘检测
-		if(o.x<-o.w||o.y<-o.h||o.x>cw||o.y>ch){
+		if(o.x<-o.w||o.y<-o.h||o.x>game.cw||o.y>game.ch){
 			return 2;
 		}else{
 			return 0;
@@ -255,35 +225,32 @@ function zdObj(m,timeout){
 	}
 }
 
+
 function enemyObj(x,y,w,h,xspeed,yspeed){
-	Obj.call(this,x,y,w,h,xspeed,yspeed);//效果类似继承，再调用父类方法
+	var o=this;
+	Obj.call(o,x,y,w,h,xspeed,yspeed);//效果类似继承，再调用父类方法
 	
 	//发射子弹
-	this.fire=function(){
-		//console.log("fire");
-		if(is_over||this.is_delete) return;
-		var o=this;
+	o.fire=function(){
+		//结束了，就不再发子弹
+		if(game.isOver()||o.is_delete) return;
 		
+		game.addZd(o);
 		setTimeout(function(){
 			o.fire();
 		},4000+Math.random()*1000-o.type*2000);
-		zdMap.push(new zdObj(o,0));
-		zdMap.push(new zdObj(o,100));
-		zdMap.push(new zdObj(o,170));
-		zdMap.push(new zdObj(o,220));
-		zdMap.push(new zdObj(o,300));
 	}
 	
 }
 function tankObj(){
-	enemyObj.call(this,Math.ceil(Math.random()*2)*cw-cw,ch-15,30,15);//效果类似继承，再调用父类方法
-	this.type=0;
-	this.run=function(){
-		var o=this;
+	var o=this;
+	enemyObj.call(o,Math.ceil(Math.random()*2)*game.cw-game.cw,game.ch-15,30,15);//效果类似继承，再调用父类方法
+	o.type=0;
+	o.run=function(){
 		//边界检测
 		if(o.x<-o.w){
 			o.xspeed=Math.random()*100*g;
-		}else if(o.x>cw){
+		}else if(o.x>game.cw){
 			//console.log(o.x)
 			o.xspeed=-Math.random()*100*g;
 		}
@@ -299,30 +266,25 @@ function tankObj(){
 
 		o.rect();
 	}
-	this.fire();
+	o.fire();
 	
 }
 function planeObj(){
-	this.type=1;
+	var o=this;
+	o.type=1;
 	var s=Math.ceil(Math.random()*2)-1;
 	//console.log(s);
-	enemyObj.call(this,s*cw,Math.random()*ch/3+100,30,10,(1-s*2)*400/rFtp);//效果类似继承，再调用父类方法
+	enemyObj.call(o,s*game.cw,Math.random()*game.ch/3+100,30,10,(1-s*2)*400/rFtp);//效果类似继承，再调用父类方法
 
-	this.run=function(){
-		var o=this;
-
+	o.run=function(){
 		//边界检测
-		if(o.x<-o.w||o.x>cw){
+		if(o.x<-o.w||o.x>game.cw){
 			s=1-s;
-			this.xspeed=(1-s*2)*400/rFtp;
+			o.xspeed=(1-s*2)*400/rFtp;
 		}
-
 		o.x+=o.xspeed;
 		o.rect(s+1);
 	}
-
-	var o=this;
-
 	setTimeout(function(){
 		o.fire(1);
 	},Math.random()*1000);

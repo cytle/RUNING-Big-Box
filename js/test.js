@@ -21,3 +21,10 @@ function testKeyDown (keyCode) {
 function testStart() {
 	window.setInterval(function(){gameStart();},1000);
 }
+
+function testDrewSixLine(){
+	
+	var gameCanvas=new canvasConsole("myCanvas"); 
+	gameCanvas.drewSixLine(55,23,123,23,10,25);
+	
+}
