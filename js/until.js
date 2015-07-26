@@ -1,3 +1,13 @@
+
+
+function random( min, max ) {
+	return Math.random() * ( max - min ) + min;
+}
+
+
+
+
+
 /**
 * is_boom 检查两个对象是否碰撞
 *******************************
@@ -6,14 +16,11 @@
 *******************************
 * @return boolean 是否碰撞
 **/
-
 /* 
 * TODO 依照轨迹再判断
 */ 
 function is_boom(n,m){
 	var zdLine=getObjLine(n);
-	console.log(zdLine);
-	console.log(m.sixLine);
 	for (var i = m.sixLine.length - 1; i >= 0; i--) {
 		if(intersectLineSegments(zdLine,m.sixLine[i]))
 			return true;

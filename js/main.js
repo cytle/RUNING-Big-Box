@@ -26,7 +26,7 @@ var speedMax=70*g;
 var game=new gameConsole();
 window.onload=function(){
 	game.init().start();
-	game.over(true);
+	game.help();
 };
 
 

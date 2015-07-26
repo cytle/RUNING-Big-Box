@@ -3,12 +3,14 @@
 <head>
 	<meta charset="utf-8">
 	<title>奔跑吧，大方块！</title>
+	<script src="js/requestAnimationFrame.js"></script>
 	<script src="js/until.js"></script>
 	<script src="js/playObj.js"></script>
 
 	<script src="js/canvasConsole.js"></script>
 	<script src="js/gameConsole.js"></script>
 	<script src="js/fireworksObj.js"></script>
+	
 	<script src="js/test.js"></script>
 	<script src="js/main.js"></script>
 	<!-- 	<script src="js/test.js"></script> -->
@@ -23,7 +25,7 @@
 		#injure_history{position: absolute;right:10px;top:60px;color: #996600;z-index: 21;}
 		#result{position: absolute;left:30%;top:20%;z-index: 23;font-size: 80px;font-weight: bold;}
 		#result small{font-size: 60%;font-weight: normal;}
-		#game_over{position: absolute;left:0px;top:0px;background-color: rgba(200,200,200,0.8);z-index: 22;width: 100%;height: 100%;display: none;}
+		#game_over{position: absolute;left:0px;top:0px;background-color: rgba(200,200,200,0);z-index: 22;width: 100%;height: 100%;display: none;}
 		#help_hp{width:50%;position: absolute;left: 25%;top: 20px;z-index: 20;font-size: 20px;line-height: 30px}
 		#help{width:100%;position: absolute;left: 0;top: 100px;height:36%;z-index: 20;font-size: 20px;background: rgba(200,200,200,0.6);}
 	</style>
@@ -45,7 +47,7 @@
 				<p>上方为血条，隔1s增加1。被子弹达到减10。</p>
 				<p>胜利条件：血条到达100</p>
 				<p>失败条件：血条小于0</p>
-				<p>操控：↑ ← →  , R 开始或重启游戏</p>
+				<p>操控：↑(W) ←(A) →(D)  , R 开始或重启游戏</p>
 			</div>
 		</div>
 	</div>

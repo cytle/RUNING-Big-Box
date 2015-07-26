@@ -24,8 +24,8 @@
 	this.is_delete=false;
 	this.lx=this.x;
 	this.ly=this.y;
-	this.rect=function(type){
-		game.draw([this.x,this.y,this.w,this.h,type?type:0]);
+	this.rect=function(type,style){
+		game.draw({x:this.x,y:this.y,lx:this.lx,ly:this.ly,w:this.w,h:this.h,type:type?type:0,style:style?style:-1});
 		this.lx=this.x;
 		this.ly=this.y;
 	};
@@ -80,7 +80,7 @@
  		if(game.isOver()){
  			return;
  		}
- 		o.hp-=0;
+ 		o.hp-=10;
 
  		if(o.hp<=0){
  			o.hp=0;
