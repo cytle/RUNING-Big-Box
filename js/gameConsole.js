@@ -1,3 +1,4 @@
+"use strict";
 function gameConsole(){
 
 	var o=this;
@@ -80,7 +81,6 @@ function gameConsole(){
 		var temp;
 		while(temp=enemyMap.shift()){
 			temp.is_delete=true;
-			delete temp; 
 		}
 
 		aPlayer.init();
@@ -181,7 +181,6 @@ function gameConsole(){
 		var temp;
 		while(temp=zdMap.shift()){
 			temp.is_delete=true;
-			delete temp; 
 		};
 
 		game_over.style.display="block";
@@ -197,7 +196,6 @@ function gameConsole(){
 		var temp;
 		while(temp=zdMap.shift()){
 			temp.is_delete=true;
-			delete temp; 
 		};
 		fireworksStart();
 		game_over.style.display="block";

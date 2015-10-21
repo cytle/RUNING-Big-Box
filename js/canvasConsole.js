@@ -1,3 +1,4 @@
+"use strict";
 function canvasConsole(CanvasId){
 	var cx=document.getElementById(CanvasId);	/*画布对象*/
 	var height=document.body.offsetHeight;			/*画布宽度*/

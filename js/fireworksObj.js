@@ -1,3 +1,4 @@
+"use strict";
 function fireworksConsole(){
 	var o=this;
 	var fireworksArr=[];

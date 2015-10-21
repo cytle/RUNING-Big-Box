@@ -1,4 +1,4 @@
-
+"use strict";
 // now we will setup our basic variables for the demo
 var canvas = document.getElementById( 'canvas' ),
 		ctx = canvas.getContext( '2d' ),
