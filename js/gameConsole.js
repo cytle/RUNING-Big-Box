@@ -150,7 +150,6 @@ function gameConsole(){
 	/*在网页上显示游戏运行信息*/
 	function setInfo(){
 		fps.innerHTML="fps:"+fps_num;
-		runTime=1000/fps_num;
 		fps_num=0;
 		zdAmount.innerHTML="子弹数量:"+zdMap.length+"|"+boomZD+"/"+fireZD;
 	};
@@ -192,7 +191,7 @@ function gameConsole(){
 		return o.gameCanvas;
 	}
 	/*游戏帮助*/
-	this.help=function(){
+	o.help=function(){
 		is_over=true;
 		aPlayer.init();
 		var temp;
@@ -212,9 +211,9 @@ function gameConsole(){
 		},1000);
 	}
 
-	this.draw=function(e){
+	o.draw=function(e){
 		o.gameCanvas.draw(e);
 	};
-	
+	return o;
 };
 
