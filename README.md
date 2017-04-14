@@ -2,7 +2,7 @@
 
 游戏《奔跑吧，方块》
 
-地址：https://cytle.github.io/uploads/running-big-box
+地址：https://cytle.github.io/uploads/runing-big-box
 
 ## 帮助 V0.2
 
